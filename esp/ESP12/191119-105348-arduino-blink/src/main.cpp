@@ -19,6 +19,24 @@ int32_t cali_data[3];
 
 float factory;
 
+#define SAMPLE 				500
+
+
+//Accelerometer array data
+struct acc_struct_xyz{
+	float x[SAMPLE];
+	float y[SAMPLE];
+	float z[SAMPLE];
+}acc_data;
+
+int acc_data_len = sizeof(acc_data);
+
+
+long startTime, endTime;
+
+
+
+
 Adxl357b  adxl357b;
 
 
@@ -38,9 +56,9 @@ int32_t deal_cali_buf(int32_t *buf)
 void calibration(void)
 {
 	int32_t x;
-	SERIAL.println("Please Place the module horizontally!");
+	//SERIAL.println("Please Place the module horizontally!");
 	delay(1000);
-	SERIAL.println("Start calibration........");
+	//SERIAL.println("Start calibration........");
 	
 	for(int i=0;i<CALI_BUF_LEN;i++)
 	{
@@ -57,12 +75,12 @@ void calibration(void)
 	for(int i=0;i<3;i++)
 	{
 		cali_data[i] =  deal_cali_buf(cali_buf[i]);
-		SERIAL.println(cali_data[i]);
+		//SERIAL.println(cali_data[i]);
 	}
 	x = (((cali_data[2] - cali_data[0]) + (cali_data[2] - cali_data[1]))/2);
 	factory = 1.0 / (float)x;
 	// SERIAL.println(x);
-	SERIAL.println("Calibration OK!!");
+	//SERIAL.println("Calibration OK!!");
 }
 
 
@@ -73,27 +91,32 @@ void calibration(void)
 void setup(void)
 {
 	//uint8_t value = 0;
-	float t;
+	//float t;
 	
 	SERIAL.begin(115200);
+	Serial.println(acc_data_len);
+	
 	if(adxl357b.begin())
 	{
 		SERIAL.println("Can't detect ADXL357B device .");
 		while(1);
 	}
-	SERIAL.println("Init OK!");
+	//SERIAL.println("Init OK!");
 	/*Set full scale range to ±40g*/
 	adxl357b.setAdxlRange(TEN_G);
 	/*Switch standby mode to measurement mode.*/
 	adxl357b.setPowerCtr(0);
 	delay(100);
 	/*Read Uncalibration temperature.*/
-	adxl357b.readTemperature(t);
+	//adxl357b.readTemperature(t);
 	
-	SERIAL.print("Uncalibration  temp = ");
-	SERIAL.println(t);
+	//SERIAL.print("Uncalibration  temp = ");
+	//SERIAL.println(t);
 	/**/
 	calibration();
+
+	
+	
 
 }
 
@@ -101,23 +124,36 @@ void setup(void)
 void loop(void)
 {
 	int32_t x,y,z;
+	float cycleTime;
 	//uint8_t entry = 0;
-	if(adxl357b.checkDataReady())
+	startTime = millis();
+	for(int i=0; i<SAMPLE; i++)
 	{
-		if(adxl357b.readXYZAxisResultData(x,y,z))
-		{
-			SERIAL.println("Get data failed!");
-		}
-		 SERIAL.print("X axis = ");
-		 SERIAL.print(x*factory);
-		 SERIAL.println('g');
-		 SERIAL.print("Y axis = ");
-		 SERIAL.print(y*factory);
-		 SERIAL.println('g');
-		 SERIAL.print("Z axis = ");
-		 SERIAL.print(z*factory);
-		 SERIAL.println('g');
 		
+		if(adxl357b.checkDataReady())
+		{
+			
+			if(!adxl357b.readXYZAxisResultData(x,y,z))
+			{
+				acc_data.x[i] = (x * factory);
+				acc_data.y[i] = y * factory;
+				acc_data.z[i] = z * factory;
+			}
+						
+		}
+		delay(10);
 	}
-	delay(100);
+	endTime = millis();
+	cycleTime = 1.0*(endTime-startTime)/SAMPLE;
+
+	//Send accelerometer array to serial interface
+	Serial.write('S'); //send start byte
+	Serial.write((uint8_t *)&acc_data, acc_data_len);
+	Serial.write('E');//send end byte
+
+	// Serial.print("Sampling period =");
+	// Serial.println(cycleTime);
+	// Serial.print("Total time:");
+	// Serial.println(endTime-startTime);
+	
 }
