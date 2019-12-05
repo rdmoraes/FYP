@@ -8,18 +8,14 @@
 #include <adxl357b.h>
 
 
-
-
-#define SERIAL Serial
-
 #define CALI_BUF_LEN           15
 #define CALI_INTERVAL_TIME     250
+#define SAMPLE 			       500
+
 int32_t cali_buf[3][CALI_BUF_LEN];
 int32_t cali_data[3];
 
 float factory;
-
-#define SAMPLE 				500
 
 
 //Accelerometer array data
@@ -30,11 +26,7 @@ struct acc_struct_xyz{
 }acc_data;
 
 int acc_data_len = sizeof(acc_data);
-
-
 long startTime, endTime;
-
-
 
 
 Adxl357b  adxl357b;
@@ -71,7 +63,7 @@ void calibration(void)
 		delay(CALI_INTERVAL_TIME);
 		// SERIAL.print('.');
 	}
-	// SERIAL.println('.');
+	
 	for(int i=0;i<3;i++)
 	{
 		cali_data[i] =  deal_cali_buf(cali_buf[i]);
@@ -86,23 +78,21 @@ void calibration(void)
 
 
 
-
-
 void setup(void)
 {
 	//uint8_t value = 0;
 	//float t;
 	
-	SERIAL.begin(115200);
-	Serial.println(acc_data_len);
+	Serial.begin(115200);
+	
 	
 	if(adxl357b.begin())
 	{
-		SERIAL.println("Can't detect ADXL357B device .");
+		Serial.println("Can't detect ADXL357B device .");
 		while(1);
 	}
 	//SERIAL.println("Init OK!");
-	/*Set full scale range to ±40g*/
+	/*Set  scale range to ±10g*/
 	adxl357b.setAdxlRange(TEN_G);
 	/*Switch standby mode to measurement mode.*/
 	adxl357b.setPowerCtr(0);
@@ -114,9 +104,6 @@ void setup(void)
 	//SERIAL.println(t);
 	/**/
 	calibration();
-
-	
-	
 
 }
 
@@ -135,7 +122,7 @@ void loop(void)
 			
 			if(!adxl357b.readXYZAxisResultData(x,y,z))
 			{
-				acc_data.x[i] = (x * factory);
+				acc_data.x[i] = x * factory;
 				acc_data.y[i] = y * factory;
 				acc_data.z[i] = z * factory;
 			}
@@ -146,7 +133,7 @@ void loop(void)
 	endTime = millis();
 	cycleTime = 1.0*(endTime-startTime)/SAMPLE;
 
-	//Send accelerometer array to serial interface
+	//Send accelerometer array serial interface
 	Serial.write('S'); //send start byte
 	Serial.write((uint8_t *)&acc_data, acc_data_len);
 	Serial.write('E');//send end byte
