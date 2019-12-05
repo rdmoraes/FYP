@@ -12,7 +12,8 @@
 #define CALI_INTERVAL_TIME     250
 #define SAMPLE 			       500
 
-#define DEBUG					0
+/*Uncomment this macro to print in the serial emulator */
+//#define DEBUG					0
 
 int32_t cali_buf[3][CALI_BUF_LEN];
 int32_t cali_data[3];
@@ -126,7 +127,7 @@ void setup(void)
 void loop(void)
 {
 	int32_t x,y,z;
-	float cycleTime;
+	
 	//uint8_t entry = 0;
 	startTime = millis();
 	for(int i=0; i<SAMPLE; i++)
@@ -143,21 +144,25 @@ void loop(void)
 			}
 						
 		}
-		delay(50);
+		delay(10);
 	}
 	endTime = millis();
-	cycleTime = 1.0*(endTime-startTime)/SAMPLE;
-
+	
 	//Send accelerometer array serial interface
 	Serial.write('S'); //send start byte
-	//Serial.write((uint8_t *)&acc_data, acc_data_len);
+	Serial.write((uint8_t *)&acc_data, acc_data_len);
 	Serial.write('E');//send end byte
 
 	#ifdef DEBUG
+		float cycleTime;
+		cycleTime = 1.0*(endTime-startTime)/SAMPLE;
+		
 		Serial.print("Sampling period =");
-	 	Serial.println(cycleTime);
+	 	Serial.print(cycleTime);
+		Serial.println("ms");
 	 	Serial.print("Total time:");
-	 	Serial.println(endTime-startTime);
+	 	Serial.print(1.0* (endTime-startTime));
+		Serial.println("ms");
 	#endif
 	
 }
