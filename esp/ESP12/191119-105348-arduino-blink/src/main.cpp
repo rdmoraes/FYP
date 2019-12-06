@@ -10,7 +10,7 @@
 
 #define CALI_BUF_LEN           15
 #define CALI_INTERVAL_TIME     250
-#define SAMPLE 			       500
+#define N_SAMPLE 			   512
 
 /*Uncomment this macro to print in the serial emulator */
 //#define DEBUG					0
@@ -23,9 +23,9 @@ float factory;
 
 //Accelerometer array data
 struct acc_struct_xyz{
-	float x[SAMPLE];
-	float y[SAMPLE];
-	float z[SAMPLE];
+	float x[N_SAMPLE];
+	float y[N_SAMPLE];
+	float z[N_SAMPLE];
 }acc_data;
 
 int acc_data_len = sizeof(acc_data);
@@ -130,7 +130,7 @@ void loop(void)
 	
 	//uint8_t entry = 0;
 	startTime = millis();
-	for(int i=0; i<SAMPLE; i++)
+	for(int i=0; i<N_SAMPLE; i++)
 	{
 		
 		if(adxl357b.checkDataReady())
@@ -144,7 +144,7 @@ void loop(void)
 			}
 						
 		}
-		delay(10);
+		delay(1);
 	}
 	endTime = millis();
 	
@@ -156,11 +156,11 @@ void loop(void)
 	#ifdef DEBUG
 		float cycleTime;
 		cycleTime = 1.0*(endTime-startTime)/SAMPLE;
-		
-		Serial.print("Sampling period =");
+
+		Serial.print("Sampling rate =");
 	 	Serial.print(cycleTime);
 		Serial.println("ms");
-	 	Serial.print("Total time:");
+	 	Serial.print("Sampling time:");
 	 	Serial.print(1.0* (endTime-startTime));
 		Serial.println("ms");
 	#endif

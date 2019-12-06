@@ -36,6 +36,7 @@ int32_t Adxl357b::begin(uint8_t dev_addr)
 {
 	uint8_t ID = 0;
 	Wire.begin();
+	Wire.setClock(500000);
 	_dev_addr = dev_addr;
 	if(readDeviceID(ID) || (ID != 0xed))
 		return -1;

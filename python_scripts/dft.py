@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Script to perform a discrete fourier transform
-
 Created on Wed Dec  4 18:15:30 2019
 
 @author: Renan
@@ -29,6 +27,7 @@ def calc_dft(sig_src, axies):
             sig_rex[j] = sig_rex[j] + sig_src[i]*math.cos(2*math.pi*j*i/len(sig_src))
             sig_imx[j] = sig_imx[j] - sig_src[i]*math.sin(2*math.pi*j*i/len(sig_src))
     
+    #Compute the magnetude of the signal
     for x in range(int(len(sig_src)/2)):
         sig_mag[x] = math.sqrt(math.pow(sig_rex[x], 2) + math.pow(sig_imx[x], 2))
             
