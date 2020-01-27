@@ -3,22 +3,30 @@
 #include <MQTTClient.h>
 #include <ArduinoJson.h>
 #include <WiFi.h>
+#include<time.h>
 
+#include "adxl357b_app.h"
 #include "secrets.h"
 
 //MQTT topics that this device will publish/subscribe
-#define AWS_IOT_PUBLISH_TOPIC   "esp32_1/pub"
-#define AWS_IOT_SUBSCRIBE_TOPIC "esp32_1/sub"
+#define AWS_IOT_PUBLISH_TOPIC   "esp32_1/samples"
+#define AWS_IOT_SUBSCRIBE_TOPIC "esp32_1/commands"
 
 
 void connectAWS();
 void messageHandler(String &topic, String &payload);
 void publishMessage();
+String getTime();
 
 
 
 WiFiClientSecure network = WiFiClientSecure();
 MQTTClient client = MQTTClient(256);
+
+
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = 3600;
+const int   daylightOffset_sec = 3600;
 
 
 
@@ -32,6 +40,10 @@ void connectAWS(){
     delay(500);
     Serial.print(".");
   }
+  Serial.println("");
+
+  // Init time connecting to ntpServer
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 
   // Configure WiFiClientSecure to use the AWS IoT device credentials
   network.setCACert(AWS_CERT_CA);
@@ -50,6 +62,7 @@ void connectAWS(){
     Serial.print(".");
     delay(100);
   }
+  Serial.println("");
 
   if(!client.connected()){
     Serial.println("AWS IoT Timeout!");
@@ -58,17 +71,27 @@ void connectAWS(){
 
   //Subscribe to a topic
   client.subscribe(AWS_IOT_SUBSCRIBE_TOPIC);
-  Serial.println("AWS IoT Connected!");
+  Serial.println("Connected AWS IoT!");
 }
 
 void messageHandler(String &topic, String &payload){
   Serial.println("incoming: " + topic + " - " + payload);
+
+  StaticJsonDocument<200> doc;
+  deserializeJson(doc, payload);
+
+  if(doc["command"] == "takeSample"){
+    Serial.println("Yes, master!");
+    takeSamples();
+  }
 }
 
 void publishMessage(){
   StaticJsonDocument<200> doc;
-  doc["time"] = millis();
-  doc["sensor_a0"] = analogRead(0);
+  doc["time"] = getTime();
+  doc["x"] = analogRead(0);
+  doc["y"] = analogRead(1);
+  doc["z"] = analogRead(2);
 
   char jsonBuffer[512];
   serializeJson(doc, jsonBuffer);
@@ -77,13 +100,23 @@ void publishMessage(){
 }
 
 
+String getTime(){
+  struct tm timeinfo;
+  if(!getLocalTime(&timeinfo)){
+    return "Failed to obtain time";
+  }
+  return asctime(&timeinfo);
+}
+
+
 void setup() {
   Serial.begin(115200);
   connectAWS();
+  startAccelerometer();
 }
 
 void loop() {
-  publishMessage();
+  //publishMessage();
   client.loop();
-  delay(10000);
+  delay(1000);
 }
