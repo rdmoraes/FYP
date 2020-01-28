@@ -15,6 +15,7 @@
 int32_t deal_cali_buf(int32_t *);
 void calibration(void);
 void startAccelerometer(void);
+void takeSamples(void);
 
 //Accelerometer array data
 struct acc_struct_xyz{

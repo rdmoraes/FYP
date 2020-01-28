@@ -10,18 +10,15 @@
 #include <adxl357b.h>
 #include <adxl357b_app.h>
 
-	
 
 int32_t cali_buf[N_AXIS ][CALI_BUF_LEN];
 int32_t cali_data[N_AXIS ];
 
 float factory;
 int acc_data_len = sizeof(acc_data);
-long startTime, endTime;
 
 
 Adxl357b  adxl357b;
-
 
 int32_t deal_cali_buf(int32_t *buf)
 {
@@ -35,24 +32,19 @@ int32_t deal_cali_buf(int32_t *buf)
 	return (int32_t)cali_val;
 }
 
-
-
 void calibration(void)
 {
 	int32_t x;
-	#ifdef DEBUG
-		Serial.println("Please place the module horizontally!");
-		delay(1000);
-		Serial.println("Start calibration........");
-	#endif
+	Serial.println("Please place the module horizontally!");
+	delay(1000);
+	Serial.println("Start calibration........");
 	
 	for(int i=0;i<CALI_BUF_LEN;i++)
 	{
 		if(adxl357b.checkDataReady())
 		{
 			if(adxl357b.readXYZAxisResultData(cali_buf[0][i],cali_buf[1][i],cali_buf[2][i]))
-			{
-			}
+			{}
 		}
 		delay(CALI_INTERVAL_TIME);
 		// SERIAL.print('.');
@@ -76,9 +68,6 @@ void calibration(void)
 	#endif
 	
 }
-
-
-
 
 void startAccelerometer(void)
 {
@@ -114,7 +103,8 @@ void startAccelerometer(void)
 void takeSamples(void)
 {
 	int32_t x,y,z;
-	
+	long startTime, endTime;
+
 	//uint8_t entry = 0;
 	startTime = millis();
 	for(int i=0; i<N_SAMPLE; i++)
@@ -138,7 +128,6 @@ void takeSamples(void)
 	//Send accelerometer array serial interface
 	Serial.write((uint8_t *)&acc_data, acc_data_len);
 	
-
 	#ifdef DEBUG
 		float cycleTime;
 		cycleTime = 1.0*(endTime-startTime)/SAMPLE;
