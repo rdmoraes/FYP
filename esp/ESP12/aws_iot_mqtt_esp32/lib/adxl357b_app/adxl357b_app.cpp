@@ -14,11 +14,14 @@
 int32_t cali_buf[N_AXIS ][CALI_BUF_LEN];
 int32_t cali_data[N_AXIS ];
 
+
+
 float factory;
-int acc_data_len = sizeof(acc_data);
+long startTime, endTime;
 
 
 Adxl357b  adxl357b;
+
 
 int32_t deal_cali_buf(int32_t *buf)
 {
@@ -32,9 +35,12 @@ int32_t deal_cali_buf(int32_t *buf)
 	return (int32_t)cali_val;
 }
 
+
+
 void calibration(void)
 {
 	int32_t x;
+	
 	Serial.println("Please place the module horizontally!");
 	delay(1000);
 	Serial.println("Start calibration........");
@@ -44,7 +50,8 @@ void calibration(void)
 		if(adxl357b.checkDataReady())
 		{
 			if(adxl357b.readXYZAxisResultData(cali_buf[0][i],cali_buf[1][i],cali_buf[2][i]))
-			{}
+			{
+			}
 		}
 		delay(CALI_INTERVAL_TIME);
 		// SERIAL.print('.');
@@ -64,8 +71,8 @@ void calibration(void)
 	
 	#ifdef DEBUG
 		Serial.println(x);
-		Serial.println("Calibration OK!!");
 	#endif
+	Serial.println("Calibration OK!!");
 	
 }
 
@@ -90,7 +97,6 @@ void startAccelerometer(void)
 	Serial.println("Accelerometer Init OK!");
 	
 	#ifdef DEBUG
-		
 		Serial.print("Uncalibration  temp = ");
 		Serial.println(t);
 	#endif
@@ -100,11 +106,10 @@ void startAccelerometer(void)
 }
 
 
-void takeSamples(void)
+void takeSamples(struct acc_struct_xyz *acc_data)
 {
 	int32_t x,y,z;
-	long startTime, endTime;
-
+	
 	//uint8_t entry = 0;
 	startTime = millis();
 	for(int i=0; i<N_SAMPLE; i++)
@@ -115,9 +120,9 @@ void takeSamples(void)
 			
 			if(!adxl357b.readXYZAxisResultData(x,y,z))
 			{
-				acc_data.x[i] = x * factory * MG_UNIT;
-				acc_data.y[i] = y * factory * MG_UNIT;
-				acc_data.z[i] = z * factory * MG_UNIT;
+				acc_data->x[i] = x * factory * MG_UNIT;
+				acc_data->y[i] = y * factory * MG_UNIT;
+				acc_data->z[i] = z * factory * MG_UNIT;
 			}
 						
 		}
@@ -126,8 +131,7 @@ void takeSamples(void)
 	endTime = millis();
 	
 	//Send accelerometer array serial interface
-	Serial.write((uint8_t *)&acc_data, acc_data_len);
-	
+	//Serial.write((uint8_t *)&acc_data, acc_data_len);
 	#ifdef DEBUG
 		float cycleTime;
 		cycleTime = 1.0*(endTime-startTime)/SAMPLE;

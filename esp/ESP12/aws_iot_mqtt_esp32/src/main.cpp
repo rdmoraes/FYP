@@ -18,6 +18,7 @@ void messageHandler(String &topic, String &payload);
 void publishMessage();
 String getTime();
 
+acc_struct_xyz accelerometer_data;
 
 
 WiFiClientSecure network = WiFiClientSecure();
@@ -82,21 +83,52 @@ void messageHandler(String &topic, String &payload){
 
   if(doc["command"] == "takeSample"){
     Serial.println("Yes, master!");
-    takeSamples();
+    publishMessage();
+    
+  }
+  if(doc["motor"]=="on"){
+    Serial.println("Turning on the engines!!");
+  }
+  else if(doc["motor"]=="off"){
+    Serial.println("Turning off the engines!!");
   }
 }
 
 void publishMessage(){
-  StaticJsonDocument<200> doc;
-  doc["time"] = getTime();
-  doc["x"] = analogRead(0);
-  doc["y"] = analogRead(1);
-  doc["z"] = analogRead(2);
+  Serial.println("Sampling...");
+  takeSamples(&accelerometer_data);
+  //Auto calculate {"motor": 1, "timestamp" : "Tue Feb 4 14:11:15", 
+  //"x_axis" : [0, ...], "y_axis" : [0, ...], "z_axis" : [0, ...] } 
+  const size_t capacity = JSON_ARRAY_SIZE(100) + JSON_OBJECT_SIZE(5);
+
+  //Allocate in stakc
+  DynamicJsonDocument doc(capacity);
+
+  //StaticJsonDocument<200> doc;
+  doc["motor:"] = 1;
+  doc["timestamp:"] = getTime();
+  JsonArray doc_x_axis = doc.createNestedArray("x_axis");
+  JsonArray doc_y_axis = doc.createNestedArray("y_axis");
+  JsonArray doc_z_axis = doc.createNestedArray("z_axis");
+
+  for(int i=0; i < N_SAMPLE; i++){
+   doc_x_axis.add(accelerometer_data.x[i]);
+   doc_y_axis.add(accelerometer_data.x[i]);
+   doc_z_axis.add(accelerometer_data.x[i]);
+  }
+  
+  serializeJson(doc, Serial);
+    
+  
+  /*doc["time"] = getTime();
+  doc["x"] = accelerometer_data->x;
+  doc["y"] = accelerometer_data->y;
+  doc["z"] = accelerometer_data->z;
 
   char jsonBuffer[512];
   serializeJson(doc, jsonBuffer);
   Serial.println("publish message");
-  client.publish(AWS_IOT_PUBLISH_TOPIC, jsonBuffer);
+  client.publish(AWS_IOT_PUBLISH_TOPIC, jsonBuffer);*/
 }
 
 
