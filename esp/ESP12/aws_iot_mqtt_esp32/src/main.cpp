@@ -11,6 +11,7 @@
 //MQTT topics that this device will publish/subscribe
 #define AWS_IOT_PUBLISH_TOPIC   "esp32_1/samples"
 #define AWS_IOT_SUBSCRIBE_TOPIC "esp32_1/commands"
+#define PACKET_SIZE              2048
 
 
 void connectAWS();
@@ -22,11 +23,11 @@ acc_struct_xyz accelerometer_data;
 
 
 WiFiClientSecure network = WiFiClientSecure();
-MQTTClient client = MQTTClient(256);
+MQTTClient client = MQTTClient(PACKET_SIZE);
 
 
 const char* ntpServer = "pool.ntp.org";
-const long  gmtOffset_sec = 3600;
+const long  gmtOffset_sec = 0;
 const int   daylightOffset_sec = 3600;
 
 
@@ -34,7 +35,8 @@ const int   daylightOffset_sec = 3600;
 void connectAWS(){
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-
+  
+  Serial.println("");
   Serial.println("Connecting to Wi-Fi");
 
   while (WiFi.status() != WL_CONNECTED){
@@ -57,7 +59,7 @@ void connectAWS(){
   // Create a message handler
   client.onMessage(messageHandler);
 
-  Serial.println("Connecting to AWS IOT");
+  Serial.println("Connecting to AWS IoT");
 
   while(!client.connect(THINGNAME)){
     Serial.print(".");
@@ -72,7 +74,7 @@ void connectAWS(){
 
   //Subscribe to a topic
   client.subscribe(AWS_IOT_SUBSCRIBE_TOPIC);
-  Serial.println("Connected AWS IoT!");
+  Serial.printf("Subscribed to topic %s \n", AWS_IOT_SUBSCRIBE_TOPIC);
 }
 
 void messageHandler(String &topic, String &payload){
@@ -95,40 +97,41 @@ void messageHandler(String &topic, String &payload){
 }
 
 void publishMessage(){
-  Serial.println("Sampling...");
   takeSamples(&accelerometer_data);
-  //Auto calculate {"motor": 1, "timestamp" : "Tue Feb 4 14:11:15", 
+  
+  //Specify JSON capacity based on format {"motor": 1, "timestamp" : "Tue Feb 4 14:11:15", 
   //"x_axis" : [0, ...], "y_axis" : [0, ...], "z_axis" : [0, ...] } 
-  const size_t capacity = JSON_ARRAY_SIZE(100) + JSON_OBJECT_SIZE(5);
+  const size_t capacity = 3*JSON_ARRAY_SIZE(100) + JSON_OBJECT_SIZE(5);
 
-  //Allocate in stakc
+  //Allocate JSON in the heap
   DynamicJsonDocument doc(capacity);
-
-  //StaticJsonDocument<200> doc;
-  doc["motor:"] = 1;
-  doc["timestamp:"] = getTime();
+  
+ 
+  doc["motor"] = 1;
+  doc["timestamp"] = getTime();
   JsonArray doc_x_axis = doc.createNestedArray("x_axis");
   JsonArray doc_y_axis = doc.createNestedArray("y_axis");
   JsonArray doc_z_axis = doc.createNestedArray("z_axis");
-
+   
   for(int i=0; i < N_SAMPLE; i++){
    doc_x_axis.add(accelerometer_data.x[i]);
-   doc_y_axis.add(accelerometer_data.x[i]);
-   doc_z_axis.add(accelerometer_data.x[i]);
+   doc_y_axis.add(accelerometer_data.y[i]);
+   doc_z_axis.add(accelerometer_data.z[i]);
   }
   
-  serializeJson(doc, Serial);
-    
-  
-  /*doc["time"] = getTime();
-  doc["x"] = accelerometer_data->x;
-  doc["y"] = accelerometer_data->y;
-  doc["z"] = accelerometer_data->z;
+  char buffer[PACKET_SIZE];
+  size_t n = serializeJson(doc, buffer);
 
-  char jsonBuffer[512];
-  serializeJson(doc, jsonBuffer);
-  Serial.println("publish message");
-  client.publish(AWS_IOT_PUBLISH_TOPIC, jsonBuffer);*/
+  Serial.println();
+  Serial.print("Sending: ");
+  Serial.println(buffer);
+  Serial.print("Payload size: ");
+  Serial.println(n);
+  
+  if(!client.publish(AWS_IOT_PUBLISH_TOPIC, buffer, n))
+    Serial.printf("Fail to publish into topic %s \n",AWS_IOT_PUBLISH_TOPIC);
+  else 
+    Serial.printf("message published!\n\n");
 }
 
 

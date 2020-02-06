@@ -5,7 +5,7 @@
 
 #define CALI_BUF_LEN           15
 #define CALI_INTERVAL_TIME     250
-#define N_SAMPLE 			   100
+#define N_SAMPLE 			   50
 #define N_AXIS                 3
 #define MG_UNIT                1000
 
