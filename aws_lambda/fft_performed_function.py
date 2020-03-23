@@ -1,33 +1,28 @@
 import json
-from json import JSONEncoder
+
 import scipy
 from scipy.fftpack import fft
 from scipy import signal
 import numpy as np
+
 import os       #enviroment variable
 import boto3    #AWS sdk for lambda
-from boto3.dynamodb.conditions import Key, Attr
+
 
 
 dynamodb = boto3.resource('dynamodb')
-raw_data_table =  os.environ['TABLE_RAW_DATA']
-analised_data_table =  os.environ['TABLE_ANALISED_DATA']
-
-table_fetch = dynamodb.Table(raw_data_table)
-table_insert = dynamodb.Table(analised_data_table)
+table_name =  os.environ['TABLE_ANALISED_DATA']
 
 
+table = dynamodb.Table(table_name)
+
+#Triggered when new data is insert into serverless table
 def lambda_handler(event, context):
     
-    print(event)
     
-    #Fetch last insertion from raw data
-    response = table_fetch.query(
-        KeyConditionExpression = Key('id').eq('2'))
+    #extract payload from raw data as string and remove newline characters
+    payload = event['Records'][0]['dynamodb']['NewImage']['payload']['S'].replace('\n', '')
     
-    
-    #extract payload as string and remove newline characters
-    payload = response['Items'][0]['payload'].replace("\n", "")
     data = json.loads(payload)
     
     #Axis data
@@ -45,9 +40,9 @@ def lambda_handler(event, context):
     fft_mag_y =np.abs(fft(y, n=128)).tolist()
     fft_mag_z =np.abs(fft(z, n=128)).tolist()
     
-    table_insert.put_item(
+    table.put_item(
         Item={
-            'id': '3',
+            'id': str(int(event['Records'][0]['dynamodb']['ApproximateCreationDateTime'])),
             'x_axis': json.dumps(fft_mag_x),
             'y_axis': json.dumps(fft_mag_y),
             'z_axis': json.dumps(fft_mag_z)
@@ -58,5 +53,5 @@ def lambda_handler(event, context):
     
     return{
         'statusCode' : 200,
-        'body': 'Analysed data added'
+        'body': 'FFT successfully performed, populating database'
     }
