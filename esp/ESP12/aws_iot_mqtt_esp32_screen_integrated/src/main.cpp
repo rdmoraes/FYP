@@ -97,22 +97,22 @@ void connectAWS(){
 void messageHandler(String &topic, String &payload){
   Serial.println("incoming: " + topic + " - " + payload);
   display.clearScreen();
-  display.print("incoming: "+ topic, 0);
-
+  display.print("incoming: ", 0);
+  
   StaticJsonDocument<200> doc;
   deserializeJson(doc, payload);
 
   if(doc["command"] == "takeSample"){
-    display.print("taking sample data!", 1);
+    display.print("take sample!", 1);
     publishMessage();
   }
   if(doc["motor"]=="on"){
-    Serial.println("Turning on the engines!!");
-    display.print("Turning on the engines!!", 1);
+    Serial.println("Turn on motor!!");
+    display.print("Turn on motor!!", 1);
   }
   else if(doc["motor"]=="off"){
-    Serial.println("Turning off the engines!!");
-    display.print("Turning off the engines!!", 1);
+    Serial.println("Turn off motor!!");
+    display.print("Turn off motor!!", 1);
   }
 }
 
@@ -148,17 +148,17 @@ void publishMessage(){
   Serial.print("Payload size: ");
   Serial.println(n);
   
-  display.print("Publishing data into topic", 2);
-  display.print(AWS_IOT_PUBLISH_TOPIC, 3);
+  display.print("Publishing data into topic", 3);
+  display.print(AWS_IOT_PUBLISH_TOPIC, 4);
   
   
   if(!client.publish(AWS_IOT_PUBLISH_TOPIC, buffer, n)){
     Serial.printf("Fail to publish into topic %s \n",AWS_IOT_PUBLISH_TOPIC);
-    display.print("publish message fail", 4);
+    display.print("publish message fail", 5);
   }
   else{
     Serial.printf("message published!\n\n");
-    display.print("message published", 4);
+    display.print("message published!", 5);
   } 
 }
 
@@ -177,13 +177,12 @@ void setup() {
   display.OLEDinit(2000);  
   connectAWS();
   
-  if(!startAccelerometer()){
-    display.clearScreen();
-    display.print("Can't detect acceleromenter",3);
+  if(startAccelerometer()){
+    display.print("Accelerometer init FAIL!",3);
     while(1);
   }
   else
-    display.print("Acceleromenter init OK!", 3);
+    display.print("Accelerometer init OK!", 3);
 }
 
 void loop() {

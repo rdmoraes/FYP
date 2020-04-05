@@ -79,9 +79,11 @@ class Adxl357b{
 		Adxl357b(){};
 		~Adxl357b(){};
 		/**begin(),i2c init & set defaule I2C address.
-		 * @param set i2c_address
+		 * @param dev_addr set i2c_address
+		 * @param sda set i2c sda pin 
+		 * @param scl set i2c scl pin
 		 **/
-		int32_t begin(uint8_t dev_addr = DEFAULT_DEV_I2C_ADDRESS);
+		int32_t begin(uint8_t dev_addr , uint8_t sda, uint8_t scl);
 
 		/**set action enable.
 		 * @param enable_x enable x axis action.When the x axis result above threshold,trigger event.

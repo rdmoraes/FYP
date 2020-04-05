@@ -82,7 +82,7 @@ int32_t startAccelerometer(void)
 {
 	float t;
 	
-	if(adxl357b.begin())
+	if(adxl357b.begin(DEFAULT_DEV_I2C_ADDRESS,SDA_ADXL357,SCL_ADXL357))
 	{
 		Serial.println("Can't detect ADXL357B device .");
 		return -1;

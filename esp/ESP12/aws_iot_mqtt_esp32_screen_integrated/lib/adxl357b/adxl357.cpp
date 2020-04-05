@@ -28,13 +28,16 @@
  */
 #include "adxl357b.h"
 
+#define Wire Wire1
+
 
 /**begin(),i2c init & set defaule I2C address.
  * @param set i2c_address
 **/
-int32_t Adxl357b::begin(uint8_t dev_addr)
+int32_t Adxl357b::begin(uint8_t dev_addr, uint8_t sda, uint8_t scl)
 {
 	uint8_t ID = 0;
+	Wire.begin(sda,scl);
 	Wire.setClock(500000);
 	_dev_addr = dev_addr;
 	if(readDeviceID(ID) || (ID != 0xed))

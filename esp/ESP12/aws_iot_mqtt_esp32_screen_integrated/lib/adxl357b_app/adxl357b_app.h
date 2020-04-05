@@ -9,6 +9,9 @@
 #define N_AXIS                 3
 #define MG_UNIT                1000
 
+#define SDA_ADXL357			   19
+#define SCL_ADXL357			   23
+
 /*Uncomment this macro to print in the serial emulator */
 //#define DEBUG					0
 
