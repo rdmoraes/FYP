@@ -4,6 +4,9 @@
 
 #include "images.h"         // Bitmap images 
 #include "heltec.h"         // OLED library
+#include "battery.h"        // Battery Macros
+
+
 
 class OLEDisplay{
     public:
@@ -13,7 +16,7 @@ class OLEDisplay{
     /**OLEDinit(), initalize heltec oled display .
      *@param int milli delay GMIT logo 
      **/
-    void OLEDinit(int);
+    void OLEDinit(uint16_t);
     void drawGMITlogo(void);
     void drawAWSicon(void);
 
@@ -21,7 +24,7 @@ class OLEDisplay{
      * @param  int counter  - counter values used to increment progress bar 
      * @param  String txt  - text that describes progress bar
      **/
-    void drawProgressBar(int, String);
+    void drawProgressBar(uint8_t, String);
 
     void clearScreen();
 
@@ -29,11 +32,15 @@ class OLEDisplay{
      * @param  String msg  - text to write on screen 
      * @param  int y  - position   
      **/
-    void print(String, int);
+    void print(String, uint8_t);
 
     void screenSleep(void);
     void screenWakeup(void);
 
+    void drawbatt(void);
+
 };
+
+extern OLEDisplay Display; 
 
 #endif

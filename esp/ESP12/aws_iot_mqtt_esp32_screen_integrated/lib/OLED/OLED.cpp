@@ -3,8 +3,13 @@
 
 
 
-void OLEDisplay::OLEDinit(int milli){
+void OLEDisplay::OLEDinit(uint16_t milli){
     Heltec.begin(true /*DisplayEnable Enable*/, false /*LoRa Disable*/, false /*Serial Enable*/);
+    
+    /** Enable Analog Reading Batt **/
+    Heltec.VextON();
+    analogSetClockDiv(255);
+    
     drawGMITlogo();
     delay(milli);
 }
@@ -25,7 +30,7 @@ void OLEDisplay::drawGMITlogo(){
     Heltec.display->display();
 }
 
-void OLEDisplay::drawProgressBar(int counter, String txt) {
+void OLEDisplay::drawProgressBar(uint8_t counter, String txt) {
   int progress = (5*counter);
   Heltec.display->clear();
 
@@ -50,7 +55,7 @@ void OLEDisplay::clearScreen(){
     Heltec.display->clear();
 }
 
-void OLEDisplay::print(String msg, int y){
+void OLEDisplay::print(String msg, uint8_t y){
     Heltec.display->setFont(ArialMT_Plain_10);
     Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
     Heltec.display->drawString(0, y * 10, msg);
@@ -65,3 +70,21 @@ void OLEDisplay::screenSleep(){
 void OLEDisplay::screenWakeup(){
     Heltec.display->wakeup();
 }
+
+void OLEDisplay::drawbatt()  
+{
+  //Battery voltage read pin changed from GPIO37
+  uint16_t battery_charge  =  analogRead(BATT_PIN)*ADC_RATIO_CORRECTION*MV;
+
+  if (battery_charge > FULL_BATT)
+    battery_charge = FULL_BATT;
+    
+  int percent = (battery_charge - FLAT_BATT)/PERCENT_FACTOR; 
+
+  Heltec.display->drawRect(110, 0,12,6);
+  Heltec.display->fillRect(123, 1, 1, 4);
+  Heltec.display->fillRect(111, 1, percent + 1, 4);
+  
+}
+
+OLEDisplay Display = OLEDisplay();
