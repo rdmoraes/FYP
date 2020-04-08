@@ -1,9 +1,0 @@
-{
-	"function": {
-		"dashlambdafunc": {
-			"build": true,
-			"providerPlugin": "awscloudformation",
-			"service": "Lambda"
-		}
-	}
-}
