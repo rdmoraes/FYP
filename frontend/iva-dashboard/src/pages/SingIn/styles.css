@@ -1,0 +1,21 @@
+.welcome-container{
+    width: 100%;
+    max-width: 1120px;
+    height: 100vh;
+    margin: 0 auto;
+    background-color: #004aad;
+
+    direction: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.welcome-container section.form{
+    width: 100px;
+
+}
+
+.welcome-container h1{
+    color: #004aad;
+    font: 800 40px Roboto, sans-serif;
+}

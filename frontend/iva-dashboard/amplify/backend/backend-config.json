@@ -1,0 +1,16 @@
+{
+	"auth": {
+		"dashboard02f24b59": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": []
+		}
+	},
+	"hosting": {
+		"amplifyhosting": {
+			"service": "amplifyhosting",
+			"type": "cicd"
+		}
+	},
+	"function": {}
+}
