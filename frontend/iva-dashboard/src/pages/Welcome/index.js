@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from 'react-router-dom'
 
 
 import './styles.css';
@@ -10,11 +11,9 @@ function WelcomePage(){
         <div className="main-container">
             <div className="welcome-container">
                 
-                    <img src={logo} alt="Engine-Analyses"/>  
-                    <button className="button" type="submit">
-                     Go to the dashboard!
-                    </button>
-                
+                    <img src={logo} alt="Engine-Analyses"/>
+                    <Link to="/dashboard" className="button">Go to the dashboard!</Link>  
+                                   
             </div>
             
         </div>

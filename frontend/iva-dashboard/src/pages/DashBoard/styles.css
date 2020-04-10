@@ -1,0 +1,41 @@
+.dashboard-container{
+    width: 100%;
+    max-width: 1180px;
+    padding: 0 30px;
+    margin: 22px auto;
+}
+
+.dashboard-container header{
+    display: flex;
+    align-items: center;
+}
+
+.dashboard-container header span{
+    font:500 40px Roboto, sans-serif;
+    margin-left: auto;
+    margin-right:auto;
+}
+
+.dashboard-container header img{
+    height: 100px;
+}
+
+.dashboard-container header .button{
+    width: 260px;
+    margin-left: auto;
+    margin-top: 0;
+}
+
+.dashboard-container header .button-refresh{
+    height: 60px;
+    width: 60px;
+    border-radius: 4px;
+    border: 1px solid #dcdce6;
+    background: transparent;
+    margin-left: 16px;
+    transition: border-color 0.2s;
+}
+
+.dashboard-container header .button-refresh:hover{
+    border-color: #999;
+}
