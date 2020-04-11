@@ -40,6 +40,8 @@ def lambda_handler(event, context):
     fft_mag_y =np.abs(fft(y, n=128)).tolist()
     fft_mag_z =np.abs(fft(z, n=128)).tolist()
     
+    
+    #insert new data into dynamo
     table.put_item(
         Item={
             'id': str(int(event['Records'][0]['dynamodb']['ApproximateCreationDateTime'])),
@@ -50,6 +52,19 @@ def lambda_handler(event, context):
         }
     )
     
+    #Updates last reading in this partition key 
+    table.put_item(
+        Item={
+            'id': 'lastResult',
+            'x_axis': json.dumps(fft_mag_x),
+            'y_axis': json.dumps(fft_mag_y),
+            'z_axis': json.dumps(fft_mag_z),
+            'x_axis_raw': json.dumps(x_axis),
+            'y_axis_raw': json.dumps(y_axis),
+            'z_axis_raw': json.dumps(z_axis)
+    
+        }
+    )
     
     return{
         'statusCode' : 200,
