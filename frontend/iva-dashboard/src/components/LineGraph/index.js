@@ -13,10 +13,14 @@ class LineGraph extends Component{
     
     constructor(props){
         super(props);
+
         this.state = {
             error: null,
             isLoaded: false,
-            data: []
+            data: [],
+            axisDirection: props.axisDirection,
+            lineColor: props.lineColor,
+            
         }
     }
 
@@ -24,9 +28,42 @@ class LineGraph extends Component{
     componentDidMount(){
        let xLabel =1, yLabel=0;
        let dataPoints = [];
-       apiData.get('getAnalysedData')
+       let data;
+              
+        apiData.get('getAnalysedData')      
        .then(res => {
-           return JSON.parse(res.data.body.Item.x_axis);
+        switch (this.state.axisDirection){
+            case 'x-axis':
+                data = JSON.parse(res.data.body.Item.x_axis);
+                break;
+            case 'y-axis':
+                data = JSON.parse(res.data.body.Item.y_axis);
+                break;
+            case 'z-axis':
+                data = JSON.parse(res.data.body.Item.z_axis);
+                break;
+            case 'x-axis-raw':
+                data = JSON.parse(res.data.body.Item.x_axis_raw);
+                break;
+            case 'y-axis-raw':
+                data = JSON.parse(res.data.body.Item.y_axis_raw);
+                break;
+            case 'z-axis-raw':
+                data = JSON.parse(res.data.body.Item.z_axis_raw);
+                break;
+            default:
+                throw new Error(`Unsupported tag name "${this.state.axisDirection}"`);
+        }
+        return data;
+        // if(this.state.axisDirection === "x-axis"){
+        //     return JSON.parse(res.data.body.Item.x_axis);
+        // }
+        // else if(this.state.axisDirection ==="y-axis"){
+        //     return JSON.parse(res.data.body.Item.y_axis);
+        // }
+            
+        // return JSON.parse(res.data.body.Item.z_axis);
+
         })
         .then(data =>{
             for(var i=0; i <data.length; i++){
@@ -59,17 +96,19 @@ class LineGraph extends Component{
             )
         }else{
             const options = {
-                theme: "light2",
+                theme: "light2", 
                 animationEnabled: true,
                 zoomEnabled: true,
-                title:{
-                    text: "Frequency Domain Analyses"
-                },
                 axisY:{
-                    includeZero: false
+                    includeZero: false,
+                    title: "Magnitude"
+                },
+                axisX:{
+                    title: "Frequency"
                 },
                 data : [{
-                    type: "area",
+                    type: "column",
+                    color: this.state.lineColor,
                     dataPoints: this.state.data
                 }]
             }        

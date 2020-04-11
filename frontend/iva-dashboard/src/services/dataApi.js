@@ -5,6 +5,4 @@ const dataApi = axios.create({
 });
 
 
-
-
 export default dataApi;
