@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
-import LineGraph from '../../components/LineGraph'
+import FFTChart from '../../components/FFTChart'
+import RawDataChart from '../../components/RawDataChart'
 import {FiRefreshCcw} from 'react-icons/fi'
 
 import logoText from '../../assets/logoText.svg'
@@ -52,27 +53,57 @@ function DashBoard(){
             <ul className="graph-container">
                 <li>
                     <strong>Time Domain (X - axis) </strong>
-                    <LineGraph axisDirection="x-axis-raw" lineColor="#ffb677" displayRefresh={isRefresh}/> 
+                    <RawDataChart 
+                    axisDirection="x-axis-raw" 
+                    lineColor="#ffb677" 
+                    displayRefresh={isRefresh}
+                    labelAxisY="Acceleration (g)"
+                    labelAxisX="Time (ms)"/> 
                 </li>
                 <li>
                     <strong>Frequency Domain (X - axis) </strong>
-                    <LineGraph axisDirection="x-axis" lineColor="#ffb677" displayRefresh={isRefresh}/> 
+                    <FFTChart 
+                    axisDirection="x-axis" 
+                    lineColor="#ffb677" 
+                    displayRefresh={isRefresh}
+                    labelAxisY="Amplitude (dB)"
+                    labelAxisX="Frequency (Hz)"/> 
                 </li>
                 <li>
                     <strong>Time Domain (Y - axis) </strong>
-                    <LineGraph axisDirection="y-axis-raw" lineColor="#3b6978" displayRefresh={isRefresh}/> 
+                    <RawDataChart 
+                    axisDirection="y-axis-raw" 
+                    lineColor="#3b6978" 
+                    displayRefresh={isRefresh}
+                    labelAxisY="Acceleration (g)"
+                    labelAxisX="Time (ms)"/> 
                 </li>
                 <li>
                     <strong>Frequency Domain (Y - axis) </strong>
-                    <LineGraph axisDirection="y-axis" lineColor="#3b6978" displayRefresh={isRefresh}/> 
+                    <FFTChart 
+                    axisDirection="y-axis" 
+                    lineColor="#3b6978" 
+                    displayRefresh={isRefresh}
+                    labelAxisY="Amplitude (dB)"
+                    labelAxisX="Frequency (Hz)"/> 
                 </li>
                 <li>
                     <strong>Time Domain (Z - axis) </strong>
-                    <LineGraph axisDirection="z-axis-raw" lineColor="#8566aa" displayRefresh={isRefresh}/> 
+                    <RawDataChart 
+                    axisDirection="z-axis-raw" 
+                    lineColor="#8566aa" 
+                    displayRefresh={isRefresh}
+                    labelAxisY="Acceleration (g)"
+                    labelAxisX="Time (ms)"/> 
                 </li>
                 <li>
                     <strong>Frequency Domain (Z - axis) </strong>
-                    <LineGraph axisDirection="z-axis" lineColor="#8566aa" displayRefresh={isRefresh}/> 
+                    <FFTChart 
+                    axisDirection="z-axis" 
+                    lineColor="#8566aa" 
+                    displayRefresh={isRefresh}
+                    labelAxisY="Amplitude (dB)"
+                    labelAxisX="Frequency (Hz)"/> 
                 </li>
                                 
             </ul>
