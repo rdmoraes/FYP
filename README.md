@@ -9,13 +9,13 @@ This repository contains the source code for iVA (intelligent Vibration Analyser
 
 **EVAL ADXL357 3-Axis Acceleromenter - Heltec Wifi Kit 32 (ESP32)**
 
-![Edge Device/IoT hardware board layer diagram](Device Layer Diagram.svg)
+![Edge Device/IoT hardware board layer diagram](Device Layer Diagram.png)
 
 ## System Architecture Diagram
 
 **AWS Cloud Architecture Diagram - IoT core / React FrontEnd / Serverless Backend**
 
-![System Architecture Diagram](AWS Architecture Diagram.svg)
+![System Architecture Diagram](AWS Architecture Diagram.png)
 
 	
 ---
