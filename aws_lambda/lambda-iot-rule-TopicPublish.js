@@ -11,6 +11,10 @@
   HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
   OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  
+  Example code from AWS IoT Core using Serverless 
+  
+  This funciton is triggered by AWS API Gateway and it is used to publish message in the topic commands
 */
 
 var AWS = require('aws-sdk');

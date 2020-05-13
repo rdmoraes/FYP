@@ -1,3 +1,9 @@
+/*
+  This funciton is triggered by AWS API Gateway and returns fft data from DynamoDB
+  
+  Renan Moraes
+*/
+
 const AWS = require('aws-sdk');
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
